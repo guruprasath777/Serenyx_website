@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.local
+.DS_Store
+
+# Vendored reference skills — tooling, not project source.
+.claude/skills/

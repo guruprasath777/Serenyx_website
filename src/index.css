@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================================================
+   Serenyx custom layer
+   Everything here was previously inline in pages/index.html. Values are
+   unchanged so the build is visually identical to the static site.
+============================================================================= */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+.font-display {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 10px;
+}
+
+.msme-badge {
+  animation: soft-pulse 3s infinite;
+}
+@keyframes soft-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* Floating Animation for Visuals */
+.floating {
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Custom Transition for Navbar */
+#main-nav {
+  transition: all 0.3s ease;
+}
+.nav-shrunk {
+  height: 4rem !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Soft radial accent orbs */
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Dot grid texture */
+.dot-grid {
+  background-image: radial-gradient(#10b981 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Terminal window */
+.terminal {
+  background: #0b1611;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 20px 40px -12px rgba(6, 78, 59, 0.35);
+}
+.terminal-bar {
+  background: #0f2019;
+  padding: 0.65rem 1rem;
+  display: flex;
+  gap: 0.4rem;
+}
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+}
+.terminal-body {
+  padding: 1.25rem 1.5rem 1.75rem;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.82rem;
+  line-height: 1.9;
+  color: #a7f3d0;
+}
+.terminal-body .muted {
+  color: #4b6f60;
+}
+.terminal-body .accent {
+  color: #6ee7b7;
+}
+
+/* Bento grid cell */
+.bento-card {
+  border-radius: 1.75rem;
+}
+
+/* --- 3D stages (see src/three/serenyx-three.js) --- */
+#hero-canvas,
+#pricing-canvas {
+  display: block;
+}
+#hero-hint {
+  transition: opacity 0.6s ease;
+}
+
+/* Keyboard focus. !important is deliberate: it has to beat Tailwind's
+   `outline-none` utility on the form fields. focus-visible, not focus,
+   so it never fires on mouse clicks. emerald-700 clears 3:1 on white. */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #047857 !important;
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
+/* Keyboard-only skip link */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  background: #047857;
+  color: #fff;
+  font-weight: 700;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .floating,
+  .msme-badge {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

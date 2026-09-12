@@ -11,6 +11,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Three.js (ESM, pinned). Must be declared before any type="module" script. -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"
+        }
+    }
+    </script>
+
     <style>
         html { scroll-behavior: smooth; }
         body { font-family: 'Inter', sans-serif; }
@@ -55,37 +65,72 @@
 
         /* Bento grid cell */
         .bento-card { border-radius: 1.75rem; }
+
+        /* --- 3D stages (see ../js/serenyx-three.js) --- */
+        #hero-canvas, #pricing-canvas { display: block; }
+        #hero-hint { transition: opacity 0.6s ease; }
+
+        /* Keyboard focus. !important is deliberate: it has to beat Tailwind's
+           `outline-none` utility on the form fields. focus-visible, not focus,
+           so it never fires on mouse clicks. emerald-700 clears 3:1 on white. */
+        a:focus-visible, button:focus-visible, summary:focus-visible,
+        input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 3px solid #047857 !important;
+            outline-offset: 2px;
+            border-radius: 0.375rem;
+        }
+
+        /* Keyboard-only skip link */
+        .skip-link {
+            position: absolute; left: 1rem; top: -4rem; z-index: 100;
+            background: #047857; color: #fff; font-weight: 700;
+            padding: 0.75rem 1.25rem; border-radius: 0.75rem;
+            transition: top 0.2s ease;
+        }
+        .skip-link:focus { top: 1rem; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .floating, .msme-badge { animation: none; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-white text-slate-800 overflow-x-hidden">
 
-    <a href="https://wa.me/917305883633" target="_blank" class="fixed bottom-24 right-6 z-[60] bg-emerald-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
-        <i class="fab fa-whatsapp text-3xl"></i>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <a href="https://wa.me/917305883633" target="_blank" rel="noopener" aria-label="Chat with Serenyx on WhatsApp" class="fixed bottom-24 right-6 z-[60] bg-emerald-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
+        <i class="fab fa-whatsapp text-3xl" aria-hidden="true"></i>
     </a>
 
-    <button id="backToTop" class="fixed bottom-6 right-6 z-[60] bg-slate-900 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl opacity-0 translate-y-10 transition-all duration-300 hover:-translate-y-1">
-        <i data-lucide="arrow-up" class="w-5 h-5"></i>
+    <button id="backToTop" type="button" aria-label="Back to top" class="fixed bottom-6 right-6 z-[60] bg-slate-900 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl opacity-0 translate-y-10 transition-all duration-300 hover:-translate-y-1">
+        <i data-lucide="arrow-up" class="w-5 h-5" aria-hidden="true"></i>
     </button>
 
     <nav id="main-nav" class="fixed w-full z-50 glass border-b border-emerald-100 h-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
             <div class="flex justify-between h-full items-center">
                 <div class="flex items-center group cursor-pointer">
-                    <img src="../Asserts/Serenyx Eagle.png" alt="Icon" class="h-10 md:h-12 w-auto object-contain mr-3 transition-transform group-hover:scale-110">
+                    <img src="../Asserts/Serenyx Eagle.png" alt="" class="h-10 md:h-12 w-auto object-contain mr-3 transition-transform group-hover:scale-110">
                     <div class="flex flex-col">
                         <img src="../Asserts/Serenyx text.png" alt="SERENYX" class="h-6 md:h-8 w-auto object-contain">
-                        <span class="text-[6px] md:text-[8px] tracking-[0.4em] uppercase font-bold text-emerald-600">Digital Solutions</span>
+                        <span class="text-[6px] md:text-[8px] tracking-[0.4em] uppercase font-bold text-emerald-700">Digital Solutions</span>
                     </div>
                 </div>
 
                 <div class="hidden md:flex space-x-8 font-medium items-center">
-                    <a href="#home" class="hover:text-emerald-600 transition">Home</a>
-                    <a href="#services" class="hover:text-emerald-600 transition">Services</a>
-                    <a href="#pricing" class="hover:text-emerald-600 transition">Pricing</a>
-                    <a href="#contact" class="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 transition shadow-md">Get Started</a>
+                    <a href="#home" class="hover:text-emerald-700 transition">Home</a>
+                    <a href="#services" class="hover:text-emerald-700 transition">Services</a>
+                    <a href="#pricing" class="hover:text-emerald-700 transition">Pricing</a>
+                    <a href="#contact" class="bg-emerald-700 text-white px-5 py-2 rounded-lg hover:bg-emerald-800 transition shadow-md">Get Started</a>
                 </div>
 
-                <button id="mobile-menu-button" class="md:hidden text-emerald-600"><i data-lucide="menu" class="w-7 h-7"></i></button>
+                <button id="mobile-menu-button" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden text-emerald-700 p-1"><i data-lucide="menu" class="w-7 h-7" aria-hidden="true"></i></button>
             </div>
         </div>
 
@@ -93,39 +138,57 @@
             <a href="#home" class="block text-lg font-semibold">Home</a>
             <a href="#services" class="block text-lg font-semibold">Services</a>
             <a href="#pricing" class="block text-lg font-semibold">Pricing</a>
-            <a href="#contact" class="block w-full text-center bg-emerald-600 text-white py-3 rounded-xl font-bold">Get Started</a>
+            <a href="#contact" class="block w-full text-center bg-emerald-700 text-white py-3 rounded-xl font-bold">Get Started</a>
         </div>
     </nav>
+
+    <main id="main">
 
     <section id="home" class="relative pt-32 pb-16 md:pt-48 md:pb-32 bg-white px-4 overflow-hidden">
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full dot-grid opacity-[0.1] pointer-events-none"></div>
         <div class="orb w-96 h-96 bg-emerald-200/40 -top-20 -left-20"></div>
         <div class="orb w-[28rem] h-[28rem] bg-emerald-100/50 top-10 -right-32"></div>
 
-        <div class="max-w-7xl mx-auto text-center relative z-10">
-            <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6" data-aos="fade-up">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> MSME-Certified Digital Studio
-            </div>
-            <h1 class="text-4xl md:text-7xl font-bold text-slate-900 mb-6 leading-tight" data-aos="fade-up">
-                Your Brand Deserves a <br class="hidden md:block">
-                <span class="text-emerald-600">Website That Winks Back</span>
-            </h1>
-            
-            <p class="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
-                Clean code. Modern design. Affordable pricing. Serenyx helps startups and creators build a powerful digital presence.
-            </p>
-            
-            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-16" data-aos="fade-up" data-aos-delay="200">
-                <a href="#contact" class="bg-emerald-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 shadow-xl transition-all hover:-translate-y-1">Start Your Project</a>
-                <a href="#pricing" class="bg-white border-2 border-emerald-100 text-emerald-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-emerald-50 transition-all hover:-translate-y-1">View Packages</a>
+        <div class="max-w-7xl mx-auto relative z-10">
+          <div class="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+
+            <div class="text-center lg:text-left">
+                <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6" data-aos="fade-up">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> MSME-Certified Digital Studio
+                </div>
+                <h1 class="text-4xl md:text-6xl lg:text-5xl xl:text-6xl font-bold text-slate-900 mb-6 leading-tight" data-aos="fade-up">
+                    Your Brand Deserves a <br class="hidden md:block">
+                    <span class="text-emerald-600">Website That Winks Back</span>
+                </h1>
+
+                <p class="text-lg md:text-xl text-slate-600 mb-10 max-w-xl mx-auto lg:mx-0" data-aos="fade-up" data-aos-delay="100">
+                    Clean code. Modern design. Affordable pricing. Serenyx helps startups and creators build a powerful digital presence.
+                </p>
+
+                <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4" data-aos="fade-up" data-aos-delay="200">
+                    <a href="#contact" class="bg-emerald-700 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-emerald-800 shadow-xl transition-all hover:-translate-y-1">Start Your Project</a>
+                    <a href="#pricing" class="bg-white border-2 border-emerald-100 text-emerald-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-emerald-50 transition-all hover:-translate-y-1">View Packages</a>
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 max-w-5xl mx-auto pt-10 border-t border-emerald-100 items-center" data-aos="fade-in" data-aos-delay="400">
+            <!-- Live WebGL brand core - rendered by ../js/serenyx-three.js -->
+            <div class="relative" data-aos="fade-left" data-aos-delay="150">
+                <div id="hero-stage" class="relative w-full h-[300px] sm:h-[380px] lg:h-[540px]">
+                    <canvas id="hero-canvas" aria-hidden="true" class="absolute inset-0 w-full h-full"></canvas>
+                    <div id="hero-hint" aria-hidden="true" class="hidden lg:inline-flex absolute bottom-1 left-1/2 -translate-x-1/2 pointer-events-none items-center gap-2 whitespace-nowrap glass border border-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 msme-badge"></span> Live WebGL &mdash; move your cursor
+                    </div>
+                </div>
+            </div>
+
+          </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 max-w-5xl mx-auto pt-10 mt-14 border-t border-emerald-100 items-center" data-aos="fade-in" data-aos-delay="400">
                 <div class="col-span-2 md:col-span-1 flex justify-center">
                     <div class="msme-badge bg-white border-2 border-emerald-500 rounded-xl px-4 py-2">
                         <div class="text-[9px] font-bold text-slate-500 uppercase mb-1">Govt. of India</div>
                         <div class="text-xl font-black text-emerald-600 leading-none">MSME</div>
-                        <div class="text-[8px] font-bold text-slate-400 uppercase mt-1">Certified</div>
+                        <div class="text-[8px] font-bold text-slate-600 uppercase mt-1">Certified</div>
                     </div>
                 </div>
                 <div><div class="text-2xl md:text-3xl font-bold">2+</div><div class="text-xs text-slate-500 uppercase">Projects Done</div></div>
@@ -186,7 +249,7 @@
                             <div class="h-10 rounded-lg bg-emerald-600"></div>
                             <div class="h-10 rounded-lg bg-emerald-300"></div>
                             <div class="h-10 rounded-lg bg-emerald-100 border border-emerald-200"></div>
-                            <div class="h-10 rounded-lg bg-white border-2 border-dashed border-emerald-300 flex items-center justify-center text-[10px] font-bold text-emerald-600 uppercase tracking-widest">On-brand kit</div>
+                            <div class="h-10 rounded-lg bg-white border-2 border-dashed border-emerald-300 flex items-center justify-center text-[10px] font-bold text-emerald-700 uppercase tracking-widest">On-brand kit</div>
                         </div>
                     </div>
                 </div>
@@ -204,6 +267,8 @@
     </section>
 
     <section id="pricing" class="py-20 bg-emerald-900 text-white relative overflow-hidden">
+        <!-- Live WebGL signal grid - rendered by ../js/serenyx-three.js -->
+        <canvas id="pricing-canvas" aria-hidden="true" class="absolute inset-0 w-full h-full pointer-events-none opacity-70"></canvas>
         <div class="orb w-[32rem] h-[32rem] bg-emerald-500/10 -bottom-40 left-1/2 -translate-x-1/2"></div>
         <div class="max-w-7xl mx-auto px-6 relative z-10">
             <div class="text-center mb-16" data-aos="fade-down">
@@ -219,10 +284,10 @@
                         <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i> Mobile responsive</li>
                         <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i> Basic SEO setup</li>
                     </ul>
-                    <a href="#contact" class="block w-full text-center py-3 bg-emerald-500 rounded-xl hover:bg-emerald-400 font-bold transition">Inquire</a>
+                    <a href="#contact" class="block w-full text-center py-3 bg-emerald-500 text-emerald-950 rounded-xl hover:bg-emerald-400 font-bold transition">Inquire</a>
                 </div>
                 <div class="bg-white p-8 rounded-3xl border-4 border-emerald-400 md:scale-105 text-slate-900 relative shadow-2xl" data-aos="zoom-in" data-aos-delay="100">
-                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-white pl-3 pr-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase flex items-center gap-1">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-700 text-white pl-3 pr-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase flex items-center gap-1">
                         <i data-lucide="sparkles" class="w-3 h-3"></i> Most Popular
                     </div>
                     <h3 class="text-xl font-bold text-emerald-800">Pro Vision</h3>
@@ -232,7 +297,7 @@
                         <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i> Premium layout</li>
                         <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i> Content management</li>
                     </ul>
-                    <a href="#contact" class="block w-full text-center py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 font-bold transition">Get Started</a>
+                    <a href="#contact" class="block w-full text-center py-3 bg-emerald-700 text-white rounded-xl hover:bg-emerald-800 font-bold transition">Get Started</a>
                 </div>
                 <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/10 hover:border-emerald-400 hover:-translate-y-1 transition-all" data-aos="zoom-in" data-aos-delay="200">
                     <h3 class="text-xl font-bold text-emerald-300">Brand Builder</h3>
@@ -272,15 +337,15 @@
                 <div class="relative h-64 overflow-hidden bg-gradient-to-br from-slate-800 to-slate-950 flex items-center justify-center">
                     <i data-lucide="shield" class="w-20 h-20 text-emerald-400 opacity-90 transition-transform duration-700 group-hover:scale-110"></i>
                     <div class="absolute top-4 left-4">
-                        <span class="bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">Business Website</span>
+                        <span class="bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">Business Website</span>
                     </div>
                 </div>
                 <div class="p-8">
                     <h3 class="text-2xl font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">RR Enterprises</h3>
                     <p class="text-slate-600 mt-3 text-sm leading-relaxed">A CCTV &amp; security solutions company website with services, products, and brand partners showcased for a Chennai-based security systems provider.</p>
                     <div class="mt-6 pt-6 border-t border-slate-50 flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Security &amp; Surveillance</span>
-                        <a href="https://guruprasath777.github.io/rrenterprises.github.io/index.html" target="_blank" class="text-emerald-600 font-bold text-sm flex items-center group/btn">
+                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">Security &amp; Surveillance</span>
+                        <a href="https://guruprasath777.github.io/rrenterprises.github.io/index.html" target="_blank" class="text-emerald-700 font-bold text-sm flex items-center group/btn">
                             View Project 
                             <i data-lucide="arrow-right" class="w-4 h-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform"></i>
                         </a>
@@ -299,8 +364,8 @@
                     <h3 class="text-2xl font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">Stem Society – ANC</h3>
                     <p class="text-slate-600 mt-3 text-sm leading-relaxed">A dedicated community platform for Stem Society's ANC chapter, built to showcase events, activities, and member engagement.</p>
                     <div class="mt-6 pt-6 border-t border-slate-50 flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Community Platform</span>
-                        <a href="https://guruprasath777.github.io/STEMSOCIETY1/index.html" target="_blank" class="text-emerald-600 font-bold text-sm flex items-center group/btn">
+                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">Community Platform</span>
+                        <a href="https://guruprasath777.github.io/STEMSOCIETY1/index.html" target="_blank" class="text-emerald-700 font-bold text-sm flex items-center group/btn">
                             View Project 
                             <i data-lucide="arrow-right" class="w-4 h-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform"></i>
                         </a>
@@ -319,8 +384,8 @@
                     <h3 class="text-2xl font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">Naturals</h3>
                     <p class="text-slate-600 mt-3 text-sm leading-relaxed">On-brand promotional posters designed for Naturals: social and in-store creatives built for visual impact and brand consistency.</p>
                     <div class="mt-6 pt-6 border-t border-slate-50 flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Poster &amp; Print Design</span>
-                        <span class="text-slate-400 font-bold text-sm">Design Work</span>
+                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">Poster &amp; Print Design</span>
+                        <span class="text-slate-600 font-bold text-sm">Design Work</span>
                     </div>
                 </div>
             </div>
@@ -353,7 +418,7 @@
 
     <section id="contact" class="py-20 bg-white">
         <div class="max-w-5xl mx-auto px-4">
-            <div class="bg-emerald-50 rounded-[2.5rem] p-8 md:p-12 shadow-2xl flex flex-col md:row gap-12 border border-emerald-100" data-aos="zoom-in-up">
+            <div class="bg-emerald-50 rounded-[2.5rem] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row gap-12 border border-emerald-100" data-aos="zoom-in-up">
                 <div class="md:w-1/3 text-center md:text-left">
                     <h2 class="text-4xl font-bold text-emerald-900 mb-6">Let's Talk!</h2>
                     <p class="text-emerald-800 mb-8">Ready to bring your vision to life? Fill out the form or reach out via email.</p>
@@ -361,24 +426,37 @@
                 </div>
                 <div class="md:w-2/3">
                     <form class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <input type="text" placeholder="Name" class="p-4 rounded-xl border-emerald-200 border outline-none focus:ring-2 focus:ring-emerald-500 transition">
-                        <input type="email" placeholder="Email" class="p-4 rounded-xl border-emerald-200 border outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                        <div>
+                            <label for="cf-name" class="block text-xs font-bold uppercase tracking-widest text-emerald-800 mb-2">Name</label>
+                            <input id="cf-name" name="name" type="text" autocomplete="name" placeholder="Virat Kohli" class="w-full p-4 rounded-xl border-emerald-200 border outline-none focus:ring-2 focus:ring-emerald-600 transition">
+                        </div>
+                        <div>
+                            <label for="cf-email" class="block text-xs font-bold uppercase tracking-widest text-emerald-800 mb-2">Email</label>
+                            <input id="cf-email" name="email" type="email" autocomplete="email" placeholder="Virat@company.in" class="w-full p-4 rounded-xl border-emerald-200 border outline-none focus:ring-2 focus:ring-emerald-600 transition">
+                        </div>
                         <div class="sm:col-span-2">
-                            <select class="w-full p-4 rounded-xl border-emerald-200 border bg-white outline-none focus:ring-2 focus:ring-emerald-500 transition">
-                                <option>Select Package</option>
+                            <label for="cf-package" class="block text-xs font-bold uppercase tracking-widest text-emerald-800 mb-2">Package</label>
+                            <select id="cf-package" name="package" class="w-full p-4 rounded-xl border-emerald-200 border bg-white outline-none focus:ring-2 focus:ring-emerald-600 transition">
+                                <option value="">Select Package</option>
                                 <option>Launch Lite</option>
                                 <option>Pro Vision</option>
                                 <option>Brand Builder</option>
                                 <option>Commerce Catalyst</option>
                             </select>
                         </div>
-                        <textarea rows="4" placeholder="Your Message" class="sm:col-span-2 p-4 rounded-xl border-emerald-200 border outline-none focus:ring-2 focus:ring-emerald-500 transition"></textarea>
-                        <button class="sm:col-span-2 py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition shadow-lg">Send Inquiry</button>
+                        <div class="sm:col-span-2">
+                            <label for="cf-message" class="block text-xs font-bold uppercase tracking-widest text-emerald-800 mb-2">Your Message</label>
+                            <textarea id="cf-message" name="message" rows="4" placeholder="A short line about what you are building and your rough timeline." class="w-full p-4 rounded-xl border-emerald-200 border outline-none focus:ring-2 focus:ring-emerald-600 transition"></textarea>
+                            <p id="cf-help" class="mt-2 text-xs text-emerald-800">We reply within 48 hours, Monday to Saturday.</p>
+                        </div>
+                        <button type="submit" class="sm:col-span-2 py-4 bg-emerald-700 text-white font-bold rounded-xl hover:bg-emerald-800 transition shadow-lg">Send Inquiry</button>
                     </form>
                 </div>
             </div>
         </div>
     </section>
+
+    </main>
 
     <footer class="bg-slate-900 pt-20 pb-10 px-6 overflow-hidden relative">
     <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none"></div>
@@ -393,14 +471,14 @@
                     <span class="text-[7px] tracking-[0.4em] uppercase font-bold text-emerald-500 mt-2">Digital Solutions</span>
                 </div>
                 <div class="flex space-x-4">
-                    <a href="#" class="w-10 h-10 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all duration-300">
-                        <i class="fab fa-instagram"></i>
+                    <a href="#" aria-label="Serenyx on Instagram" class="w-10 h-10 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all duration-300">
+                        <i class="fab fa-instagram" aria-hidden="true"></i>
                     </a>
-                    <a href="#" class="w-10 h-10 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all duration-300">
-                        <i class="fab fa-linkedin-in"></i>
+                    <a href="#" aria-label="Serenyx on LinkedIn" class="w-10 h-10 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all duration-300">
+                        <i class="fab fa-linkedin-in" aria-hidden="true"></i>
                     </a>
-                    <a href="#" class="w-10 h-10 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all duration-300">
-                        <i class="fab fa-twitter"></i>
+                    <a href="#" aria-label="Serenyx on X (Twitter)" class="w-10 h-10 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all duration-300">
+                        <i class="fab fa-twitter" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>
@@ -439,30 +517,59 @@
                         <i data-lucide="shield-check" class="w-7 h-7 text-emerald-500"></i>
                     </div>
                     <h5 class="text-white font-bold text-xs uppercase tracking-widest mb-1">Govt. Registered</h5>
-                    <p class="text-[10px] text-slate-500 uppercase leading-tight">MSME UDYAM CERTIFIED ENTERPRISE</p>
+                    <p class="text-[10px] text-slate-400 uppercase leading-tight">MSME UDYAM CERTIFIED ENTERPRISE</p>
                 </div>
             </div>
         </div>
 
-        <div class="border-t border-slate-800 pt-8 flex flex-col md:row justify-between items-center gap-4 text-[11px] text-slate-500 font-medium">
-            <p>© 2025 SERENYX. All rights reserved.</p>
-            <div class="flex space-x-6 uppercase tracking-widest">
-                <a href="#" class="hover:text-emerald-500 transition-colors">Privacy Policy</a>
-                <a href="#" class="hover:text-emerald-500 transition-colors">Terms of Service</a>
-            </div>
-        </div>
+        <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-slate-400 font-medium">
+
+    <p>
+        © <span id="year"></span> SERENYX. All rights reserved.
+    </p>
+
+    <div class="flex space-x-6 uppercase tracking-widest">
+        <a href="#" class="hover:text-emerald-500 transition-colors">
+            Privacy Policy
+        </a>
+
+        <a href="#" class="hover:text-emerald-500 transition-colors">
+            Terms of Service
+        </a>
+    </div>
+
+</div>
+
+<script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+</script>
     </div>
 </footer>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Initialize Animations
-        AOS.init({ duration: 1000, once: true, offset: 100 });
+        const REDUCE_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Initialize Animations. Under reduced motion AOS is disabled entirely,
+        // which leaves every element in its final, readable state.
+        AOS.init({ duration: 1000, once: true, offset: 100, disable: REDUCE_MOTION });
         lucide.createIcons();
+
+        // Every Lucide glyph on this page sits beside its own visible text, so
+        // they are decorative. Done after createIcons() because it swaps the
+        // <i> placeholder for a fresh <svg>.
+        document.querySelectorAll('svg.lucide, [data-lucide]').forEach((el) => {
+            el.setAttribute('aria-hidden', 'true');
+            el.setAttribute('focusable', 'false');
+        });
 
         // Mobile Menu Toggle
         const btn = document.getElementById('mobile-menu-button');
         const menu = document.getElementById('mobile-menu');
-        btn.addEventListener('click', () => menu.classList.toggle('hidden'));
+        btn.addEventListener('click', () => {
+            const open = menu.classList.toggle('hidden') === false;
+            btn.setAttribute('aria-expanded', String(open));
+            btn.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+        });
 
         // Scroll Logic: Navbar Shrink & Back to Top
         const nav = document.getElementById('main-nav');
@@ -487,8 +594,11 @@
         });
 
         btt.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: REDUCE_MOTION ? 'auto' : 'smooth' });
         });
     </script>
+
+    <!-- 3D UI layer (hero brand core + pricing signal grid) -->
+    <script type="module" src="../js/serenyx-three.js"></script>
 </body>
 </html>
