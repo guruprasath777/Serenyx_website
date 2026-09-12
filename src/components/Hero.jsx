@@ -2,10 +2,15 @@ import { Sparkles } from 'lucide-react';
 import { stats } from '../data/site.js';
 
 export default function Hero({ canvasRef, hintVisible, webglSupported }) {
+  // Top padding clears the fixed 80px nav and then adds breathing room: 48px on
+  // mobile, 64px from md up. The previous desktop value was 12rem, which left
+  // 112px of dead space under the header and made the section top-heavy against
+  // its bottom padding. Don't write Tailwind class names in these comments -
+  // the content scanner reads file text and will emit the rule for real.
   return (
     <section
       id="home"
-      className="relative pt-32 pb-16 md:pt-48 md:pb-32 bg-white px-4 overflow-hidden"
+      className="relative pt-32 pb-16 md:pt-36 md:pb-32 bg-white px-4 overflow-hidden"
     >
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full dot-grid opacity-[0.1] pointer-events-none" />
       <div className="orb w-96 h-96 bg-emerald-200/40 -top-20 -left-20" />
